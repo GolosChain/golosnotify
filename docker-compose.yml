@@ -10,8 +10,10 @@ services:
     links:
       - datastore
     environment:
-      - WS_CONNECTION
-      - IMG_PROXY_PREFIX
+      - STEEMIT_WEBSOCKET_CONNECTION='wss://rpc.sandbox.golos.io'
+      - STEEMIT_WEBCLIENT_ADDRESS='https://golos.io'
+      - STEEMIT_IMAGE_PROXY_PREFIX='https://imgp.golos.io/'
+      - STEEMIT_TITLE = 'Golos'
 
   datastore:
     image: datastore

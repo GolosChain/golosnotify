@@ -33,7 +33,7 @@ tnt_server = None
 steem_space = None
 followers_space = None
 chain = None
-img_proxy_prefix = os.environ['IMG_PROXY_PREFIX']
+img_proxy_prefix = os.environ['STEEMIT_IMAGE_PROXY_PREFIX']
 processed_posts = {}
 
 def get_post_key(post):
@@ -81,14 +81,14 @@ def processMentions(author_account, text, op):
     # print('\nop: ', op)
     if op['parent_author']:
         what = 'comment'
-        url = 'https://golos.io/@%s/%s#@%s/%s' % (op['parent_author'], op['parent_permlink'], op['author'], op['permlink'])
+        url = '%s/@%s/%s#@%s/%s' % (os.environ['STEEMIT_WEBCLIENT_ADDRESS'], op['parent_author'], op['parent_permlink'], op['author'], op['permlink'])
     else:
         what = 'post'
-        url = 'https://golos.io/@%s/%s' % (op['author'], op['permlink'])
+        url = '%s/@%s/%s' % (os.environ['STEEMIT_WEBCLIENT_ADDRESS'], op['author'], op['permlink'])
     for mention in set(mentions):
         if (mention != op['author']):
             # print('--- mention: ', what, url, mention, mention[1:])
-            title = 'Golos'
+            title = os.environ['STEEMIT_TITLE']
             body = '@%s mentioned you in a %s' % (op['author'], what)
             profile = author_account.profile
             pic = img_proxy_prefix + profile['profile_image'] if profile and 'profile_image' in profile else ''
@@ -115,9 +115,9 @@ def processOp(op_data):
                 if author_account.rep > 40:
                     if op['parent_author']:
                         # print('comment', op['author'], op['parent_author'])
-                        title = 'Golos'
+                        title = os.environ['STEEMIT_TITLE']
                         body = '@%s replied to your post or comment' % (op['author'])
-                        url = 'https://golos.io/@%s/recent-replies' % (op['parent_author'])
+                        url = '%s/@%s/recent-replies' % (os.environ['STEEMIT_WEBCLIENT_ADDRESS'], op['parent_author'])
                         profile = author_account.profile
                         pic = img_proxy_prefix + profile['profile_image'] if profile and 'profile_image' in profile else ''
                         tnt_server.call('notification_add', op['parent_author'], NTYPES['comment_reply'], title, body, url, pic)
@@ -131,18 +131,18 @@ def processOp(op_data):
     if op_type.startswith('transfer'):
         if op['from'] != op['to']:
             # print(op_type, op['from'], op['to'])
-            title = 'Golos'
+            title = os.environ['STEEMIT_TITLE']
             body = 'you transfered %s to @%s' % (op['amount'], op['to'])
-            url = 'https://golos.io/@%s/transfers' % (op['from'])
+            url = '%s/@%s/transfers' % (os.environ['STEEMIT_WEBCLIENT_ADDRESS'], op['from'])
             tnt_server.call('notification_add', op['from'], NTYPES['send'], title, body, url, '')
             body = 'you received %s from @%s' % (op['amount'], op['from'])
-            url = 'https://golos.io/@%s/transfers' % (op['to'])
+            url = '%s/@%s/transfers' % (os.environ['STEEMIT_WEBCLIENT_ADDRESS'], op['to'])
             tnt_server.call('notification_add', op['to'], NTYPES['receive'], title, body, url, '')
     if op_type == 'account_update' and ('active' in op or 'owner' in op or 'posting' in op):
         #print(json.dumps(op, indent=4))
-        title = 'Golos'
+        title = os.environ['STEEMIT_TITLE']
         body = 'account @%s has been updated or password changed' % (op['account'])
-        url = 'https://golos.io/@%s/permissions' % (op['account'])
+        url = '%s/@%s/permissions' % (os.environ['STEEMIT_WEBCLIENT_ADDRESS'], op['account'])
         tnt_server.call('notification_add', op['account'], NTYPES['account_update'], title, body, url, '')
     # if op_type == 'vote':
         # print('----', op['voter'], op['permlink'])
@@ -173,7 +173,7 @@ def run():
         steem_space.update('last_block_id', [('=', 1, last_block)])
 
 
-ws_connection = os.environ['WS_CONNECTION']
+ws_connection = os.environ['STEEMIT_WEBSOCKET_CONNECTION']
 print('Connecting to ', ws_connection)
 sys.stdout.flush()
 steem = Steem(ws_connection)
