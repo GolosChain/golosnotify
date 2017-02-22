@@ -3,7 +3,7 @@ version: '2'
 services:
 
   datafeed:
-    image: datafeed
+    image: goloschain/golosnotify/datafeed
     build:
       context: .
       dockerfile: Dockerfile-datafeed
@@ -16,7 +16,7 @@ services:
       - STEEMIT_TITLE = 'Golos'
 
   datastore:
-    image: datastore
+    image: goloschain/golosnotify/datastore
     build:
       context: .
       dockerfile: Dockerfile-datastore
