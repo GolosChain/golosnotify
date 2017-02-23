@@ -14,18 +14,18 @@ from steem.post import Post
 from steem.exceptions import PostDoesNotExist
 
 NTYPES = {
-  'total': 0,
-  'feed': 1,
-  'reward': 2,
-  'send': 3,
-  'mention': 4,
-  'follow': 5,
-  'vote': 6,
-  'comment_reply': 7,
-  'post_reply': 8,
-  'account_update': 9,
-  'message': 10,
-  'receive': 11
+    'total': 0,
+    'feed': 1,
+    'reward': 2,
+    'send': 3,
+    'mention': 4,
+    'follow': 5,
+    'vote': 6,
+    'comment_reply': 7,
+    'post_reply': 8,
+    'account_update': 9,
+    'message': 10,
+    'receive': 11
 }
 
 steem = None
@@ -49,7 +49,7 @@ def _get_followers(account, direction='follower', last_user=''):
         followers = account.get_followers()
     elif direction == 'following':
         followers = account.get_following()
-    return followers
+        return followers
 
 def getFollowers(account):
     # print('getFollowers', account.name)
@@ -60,7 +60,7 @@ def getFollowers(account):
         followers_space.insert((account.name, followers))
     else:
         followers = res[0][1]
-    return followers
+        return followers
 
 def addFollower(account_name, follower):
     # print('addFollower', account_name, follower)
@@ -85,14 +85,14 @@ def processMentions(author_account, text, op):
     else:
         what = 'post'
         url = '%s/@%s/%s' % (os.environ['STEEMIT_WEBCLIENT_ADDRESS'], op['author'], op['permlink'])
-    for mention in set(mentions):
-        if (mention != op['author']):
-            # print('--- mention: ', what, url, mention, mention[1:])
-            title = os.environ['STEEMIT_TITLE']
-            body = '@%s mentioned you in a %s' % (op['author'], what)
-            profile = author_account.profile
-            pic = img_proxy_prefix + profile['profile_image'] if profile and 'profile_image' in profile else ''
-            tnt_server.call('notification_add', mention[1:], NTYPES['mention'], title, body, url, pic)
+        for mention in set(mentions):
+            if (mention != op['author']):
+                # print('--- mention: ', what, url, mention, mention[1:])
+                title = os.environ['STEEMIT_TITLE']
+                body = '@%s mentioned you in a %s' % (op['author'], what)
+                profile = author_account.profile
+                pic = img_proxy_prefix + profile['profile_image'] if profile and 'profile_image' in profile else ''
+                tnt_server.call('notification_add', mention[1:], NTYPES['mention'], title, body, url, pic)
 
 def processOp(op_data):
     op_type = op_data[0]
@@ -103,30 +103,30 @@ def processOp(op_data):
             data = op_json[1]
             addFollower(data['following'], data['follower'])
             tnt_server.call('notification_add', data['following'], NTYPES['follow'])
-    if op_type == 'comment':
-        comment_body = op['body']
-        if comment_body and not comment_body.startswith('@@ '):
-            post = Post(op, steem_instance=steem)
-            pkey = get_post_key(post)
-            # print('post: ', pkey)
-            if pkey and not pkey in processed_posts:
-                # with suppress(Exception):
-                author_account = Account(op['author'])
-                if author_account.rep > 40:
-                    if op['parent_author']:
-                        # print('comment', op['author'], op['parent_author'])
-                        title = os.environ['STEEMIT_TITLE']
-                        body = '@%s replied to your post or comment' % (op['author'])
-                        url = '%s/@%s/recent-replies' % (os.environ['STEEMIT_WEBCLIENT_ADDRESS'], op['parent_author'])
-                        profile = author_account.profile
-                        pic = img_proxy_prefix + profile['profile_image'] if profile and 'profile_image' in profile else ''
-                        tnt_server.call('notification_add', op['parent_author'], NTYPES['comment_reply'], title, body, url, pic)
-                    else:
-                        followers = getFollowers(author_account)
-                        for follower in followers:
-                            tnt_server.call('notification_add', follower, NTYPES['feed'])
-                    processMentions(author_account, comment_body, op)
-                processed_posts[pkey] = True
+            if op_type == 'comment':
+                comment_body = op['body']
+                if comment_body and not comment_body.startswith('@@ '):
+                    post = Post(op, steem_instance=steem)
+                    pkey = get_post_key(post)
+                    # print('post: ', pkey)
+                    if pkey and not pkey in processed_posts:
+                        # with suppress(Exception):
+                            author_account = Account(op['author'])
+                            if author_account.rep > 40:
+                                if op['parent_author']:
+                                    # print('comment', op['author'], op['parent_author'])
+                                    title = os.environ['STEEMIT_TITLE']
+                                    body = '@%s replied to your post or comment' % (op['author'])
+                                    url = '%s/@%s/recent-replies' % (os.environ['STEEMIT_WEBCLIENT_ADDRESS'], op['parent_author'])
+                                    profile = author_account.profile
+                                    pic = img_proxy_prefix + profile['profile_image'] if profile and 'profile_image' in profile else ''
+                                    tnt_server.call('notification_add', op['parent_author'], NTYPES['comment_reply'], title, body, url, pic)
+                                else:
+                                    followers = getFollowers(author_account)
+                                    for follower in followers:
+                                        tnt_server.call('notification_add', follower, NTYPES['feed'])
+                                        processMentions(author_account, comment_body, op)
+                                        processed_posts[pkey] = True
 
     if op_type.startswith('transfer'):
         if op['from'] != op['to']:
@@ -138,14 +138,14 @@ def processOp(op_data):
             body = 'you received %s from @%s' % (op['amount'], op['from'])
             url = '%s/@%s/transfers' % (os.environ['STEEMIT_WEBCLIENT_ADDRESS'], op['to'])
             tnt_server.call('notification_add', op['to'], NTYPES['receive'], title, body, url, '')
-    if op_type == 'account_update' and ('active' in op or 'owner' in op or 'posting' in op):
-        #print(json.dumps(op, indent=4))
-        title = os.environ['STEEMIT_TITLE']
-        body = 'account @%s has been updated or password changed' % (op['account'])
-        url = '%s/@%s/permissions' % (os.environ['STEEMIT_WEBCLIENT_ADDRESS'], op['account'])
-        tnt_server.call('notification_add', op['account'], NTYPES['account_update'], title, body, url, '')
-    # if op_type == 'vote':
-        # print('----', op['voter'], op['permlink'])
+            if op_type == 'account_update' and ('active' in op or 'owner' in op or 'posting' in op):
+                #print(json.dumps(op, indent=4))
+                title = os.environ['STEEMIT_TITLE']
+                body = 'account @%s has been updated or password changed' % (op['account'])
+                url = '%s/@%s/permissions' % (os.environ['STEEMIT_WEBCLIENT_ADDRESS'], op['account'])
+                tnt_server.call('notification_add', op['account'], NTYPES['account_update'], title, body, url, '')
+                # if op_type == 'vote':
+                    # print('----', op['voter'], op['permlink'])
 
 def run():
     global steem
@@ -163,14 +163,14 @@ def run():
         if last_block % 10 == 0:
             print('processing block', last_block)
             sys.stdout.flush()
-        for t in block['transactions']:
-            for op in t['operations']:
-                # if op[0] not in ['comment', 'vote', 'custom_json', 'pow2', 'account_create', 'limit_order_create', 'limit_order_cancel', 'feed_publish', 'comment_options', 'account_witness_vote', 'account_update'] and not op[0].startswith('transfer'):
-                #     print('---------', op[0])
-                #     print(json.dumps(op[1], indent=4))
-                processOp(op)
-        last_block += 1
-        steem_space.update('last_block_id', [('=', 1, last_block)])
+            for t in block['transactions']:
+                for op in t['operations']:
+                    # if op[0] not in ['comment', 'vote', 'custom_json', 'pow2', 'account_create', 'limit_order_create', 'limit_order_cancel', 'feed_publish', 'comment_options', 'account_witness_vote', 'account_update'] and not op[0].startswith('transfer'):
+                        #     print('---------', op[0])
+                        #     print(json.dumps(op[1], indent=4))
+                        processOp(op)
+                        last_block += 1
+                        steem_space.update('last_block_id', [('=', 1, last_block)])
 
 
 ws_connection = os.environ['STEEMIT_WEBSOCKET_CONNECTION']
