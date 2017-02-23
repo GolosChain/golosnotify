@@ -1,4 +1,4 @@
-version: '2'
+version: '3'
 
 services:
 
@@ -23,5 +23,13 @@ services:
     ports:
       - "3301:3301"
     volumes:
-      - ./data:/var/lib/tarantool
-      - ./:/home/src
+      # - ./data:/var/lib/tarantool
+      # - ./:/home/src
+      - data:/var/lib/tarantool/
+      - log:/var/log/tarantool/
+
+volumes:
+
+    data:
+    log:
+
