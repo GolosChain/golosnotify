@@ -1,6 +1,8 @@
 FROM python:3.5
 
-RUN pip3 install steem tarantool
+RUN pip3 install tarantool
+# install python-steem from develop branch for now
+RUN pip3 install git+https://github.com/xeroc/python-steem.git@develop
 
 ENV STEEM_USER   steem
 ENV STEEM_HOME   /home/steem

@@ -14,27 +14,27 @@ from steem.post import Post
 from steem.exceptions import PostDoesNotExist
 
 NTYPES = {
-  'total': 0,
-  'feed': 1,
-  'reward': 2,
-  'send': 3,
-  'mention': 4,
-  'follow': 5,
-  'vote': 6,
-  'comment_reply': 7,
-  'post_reply': 8,
-  'account_update': 9,
-  'message': 10,
-  'receive': 11
+  'total'           : 0,
+  'feed'            : 1,
+  'reward'          : 2,
+  'send'            : 3,
+  'mention'         : 4,
+  'follow'          : 5,
+  'vote'            : 6,
+  'comment_reply'   : 7,
+  'post_reply'      : 8,
+  'account_update'  : 9,
+  'message'         : 10,
+  'receive'         : 11
 }
 
-steem = None
-tnt_server = None
-steem_space = None
-followers_space = None
-chain = None
-img_proxy_prefix = os.environ['STEEMIT_IMAGE_PROXY_PREFIX']
-processed_posts = {}
+steem               = None
+tnt_server          = None
+steem_space         = None
+followers_space     = None
+chain               = None
+img_proxy_prefix    = os.environ['STEEMIT_IMAGE_PROXY_PREFIX']
+processed_posts     = {}
 
 def get_post_key(post):
     try:
