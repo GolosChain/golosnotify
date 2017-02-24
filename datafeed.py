@@ -69,7 +69,7 @@ def addFollower(account_name, follower):
     res = tnt_server.call('add_follower', account_name, follower)
     if not res[0][0]:
         with suppress(Exception):
-            followers = _get_followers(Account(account_name), steem)
+            followers = _get_followers(Account(account_name, steem))
             followers.append(follower)
             followers_space.insert((account_name, followers))
             tnt_server.call('add_follower', account_name, follower)
