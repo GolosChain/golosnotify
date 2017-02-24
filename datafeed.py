@@ -112,7 +112,7 @@ def processOp(op_data):
                     if pkey and not pkey in processed_posts:
                         # with suppress(Exception):
                             author_account = Account(op['author'], steem)
-                            if author_account.rep > 40:
+                            if author_account.rep >= 0:
                                 if op['parent_author']:
                                     # print('comment', op['author'], op['parent_author'])
                                     title = os.environ['STEEMIT_TITLE']
