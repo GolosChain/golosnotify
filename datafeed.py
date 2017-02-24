@@ -169,8 +169,8 @@ def run():
                         #     print('---------', op[0])
                         #     print(json.dumps(op[1], indent=4))
                         processOp(op)
-                        last_block += 1
-                        steem_space.update('last_block_id', [('=', 1, last_block)])
+            last_block += 1
+            steem_space.update('last_block_id', [('=', 1, last_block)])
 
 
 ws_connection = os.environ['STEEMIT_WEBSOCKET_CONNECTION']
