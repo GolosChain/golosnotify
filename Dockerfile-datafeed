@@ -1,17 +1,21 @@
 FROM python:3.5
 
 RUN pip3 install tarantool
-# install python-steem from develop branch for now
-RUN pip3 install git+https://github.com/xeroc/python-steem.git@develop
 
-ENV STEEM_USER   steem
-ENV STEEM_HOME   /home/steem
+# ENV STEEM_USER   steem
+# ENV STEEM_HOME   /home/steem
 
-RUN useradd -m $STEEM_USER && chown -R $STEEM_USER $STEEM_HOME
+ENV STEEM_HOME   /steem
 
-USER $STEEM_USER
+
+# RUN useradd -m $STEEM_USER && chown -R $STEEM_USER $STEEM_HOME
+
+# USER $STEEM_USER
 WORKDIR $STEEM_HOME
 
 COPY datafeed.py .
+COPY python-steem python-steem
+
+RUN cd ./python-steem && python3 setup.py install
 
 CMD ["python", "./datafeed.py"]

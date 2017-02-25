@@ -11,7 +11,7 @@ services:
       - datastore
     environment:
       - STEEMIT_WEBSOCKET_CONNECTION=wss://rpc.sandbox.golos.io
-      - STEEMIT_WEBCLIENT_ADDRESS=https://golos.io
+      - STEEMIT_WEBCLIENT_ADDRESS=https://sandbox.golos.io
       - STEEMIT_IMAGE_PROXY_PREFIX=https://imgp.golos.io/
       - STEEMIT_TITLE='Golos'
 

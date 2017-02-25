@@ -38,10 +38,13 @@ processed_posts     = {}
 
 def get_post_key(post):
     try:
+        print('<------ get_post_key ..... checking meta ')
         if not post.meta or type(post.meta) != type(dict()) or not 'tags' in post.meta or len(post.meta['tags']) == 0:
+            print('<------ get_post_key : ', 'Post.meta problems')
             return None
         return '/%s/@%s/%s' % (post.meta['tags'][0], post.author, post.permlink)
     except PostDoesNotExist:
+        print('<------ get_post_key : ', 'Post does not exist')
         return None
 
 def _get_followers(account, direction='follower', last_user=''):
@@ -69,7 +72,7 @@ def addFollower(account_name, follower):
     res = tnt_server.call('add_follower', account_name, follower)
     if not res[0][0]:
         with suppress(Exception):
-            followers = _get_followers(Account(account_name))
+            followers = _get_followers(Account(account_name, steem))
             followers.append(follower)
             followers_space.insert((account_name, followers))
             tnt_server.call('add_follower', account_name, follower)
@@ -102,13 +105,13 @@ def processOp(op_data):
 
 # ------------ follow
 
-    # if op_type == 'custom_json' and op['id'] == 'follow':
-    #     op_json = json.loads(op['json'])
-    #     if isinstance(op_json, list) and op_json[0] == 'follow':
-    #         print('\n<--------- operation: ', 'follow')
-    #         data = op_json[1]
-    #         addFollower(data['following'], data['follower'])
-    #         tnt_server.call('notification_add', data['following'], NTYPES['follow'])
+    if op_type == 'custom_json' and op['id'] == 'follow':
+        op_json = json.loads(op['json'])
+        if isinstance(op_json, list) and op_json[0] == 'follow':
+            print('\n<--------- operation: ', 'follow')
+            data = op_json[1]
+            addFollower(data['following'], data['follower'])
+            tnt_server.call('notification_add', data['following'], NTYPES['follow'])
 
 # ------------ comment
 
@@ -117,12 +120,17 @@ def processOp(op_data):
         comment_body = op['body']
         if comment_body and not comment_body.startswith('@@ '):
             post = Post(op, steem_instance=steem)
+            print('\n<--------- processOP ---- post object created! ')
+            print("<--------- processOP post.get(\"total_payout_value\") = ", post.get("total_payout_value"))
+            print("<--------- processOP post.get(\"total_pening_payout_value\") = ", post.get("total_pening_payout_value"))
+
+            print('<------ comment_body : ', comment_body)
             pkey = get_post_key(post)
-            # print('post: ', pkey)
+            print('<------ pkey : ', pkey)
             if pkey and not pkey in processed_posts:
                 # with suppress(Exception):
-                author_account = Account(op['author'])
-                if author_account.rep > 40:
+                author_account = Account(op['author'], steem)
+                if author_account.rep >= 1:
                     if op['parent_author']:
                         # print('comment', op['author'], op['parent_author'])
                         title   = os.environ['STEEMIT_TITLE']
@@ -138,32 +146,35 @@ def processOp(op_data):
                     processMentions(author_account, comment_body, op)
                 processed_posts[pkey] = True
 
+
+
+
 # ------------ transfer
 
-    # if op_type.startswith('transfer'):
-    #     print('\n<--------- operation: ', 'transfer')
-    #     if op['from'] != op['to']:
-    #         # print(op_type, op['from'], op['to'])
-    #         title = os.environ['STEEMIT_TITLE']
-    #         body = 'you transfered %s to @%s' % (op['amount'], op['to'])
-    #         url = '%s/@%s/transfers' % (os.environ['STEEMIT_WEBCLIENT_ADDRESS'], op['from'])
-    #         tnt_server.call('notification_add', op['from'], NTYPES['send'], title, body, url, '')
-    #         body = 'you received %s from @%s' % (op['amount'], op['from'])
-    #         url = '%s/@%s/transfers' % (os.environ['STEEMIT_WEBCLIENT_ADDRESS'], op['to'])
-    #         tnt_server.call('notification_add', op['to'], NTYPES['receive'], title, body, url, '')
+    if op_type.startswith('transfer'):
+        print('\n<--------- operation: ', 'transfer')
+        if op['from'] != op['to']:
+            # print(op_type, op['from'], op['to'])
+            title = os.environ['STEEMIT_TITLE']
+            body = 'you transfered %s to @%s' % (op['amount'], op['to'])
+            url = '%s/@%s/transfers' % (os.environ['STEEMIT_WEBCLIENT_ADDRESS'], op['from'])
+            tnt_server.call('notification_add', op['from'], NTYPES['send'], title, body, url, '')
+            body = 'you received %s from @%s' % (op['amount'], op['from'])
+            url = '%s/@%s/transfers' % (os.environ['STEEMIT_WEBCLIENT_ADDRESS'], op['to'])
+            tnt_server.call('notification_add', op['to'], NTYPES['receive'], title, body, url, '')
 
 # ------------ account update
 
-    # if op_type == 'account_update' and ('active' in op or 'owner' in op or 'posting' in op):
-    #     print('\n<--------- operation: ', 'account_update')
+    if op_type == 'account_update' and ('active' in op or 'owner' in op or 'posting' in op):
+        print('\n<--------- operation: ', 'account_update')
 
-    #     #print(json.dumps(op, indent=4))
-    #     title = os.environ['STEEMIT_TITLE']
-    #     body = 'account @%s has been updated or password changed' % (op['account'])
-    #     url = '%s/@%s/permissions' % (os.environ['STEEMIT_WEBCLIENT_ADDRESS'], op['account'])
-    #     tnt_server.call('notification_add', op['account'], NTYPES['account_update'], title, body, url, '')
-    # if op_type == 'vote':
-        # print('----', op['voter'], op['permlink'])
+        #print(json.dumps(op, indent=4))
+        title = os.environ['STEEMIT_TITLE']
+        body = 'account @%s has been updated or password changed' % (op['account'])
+        url = '%s/@%s/permissions' % (os.environ['STEEMIT_WEBCLIENT_ADDRESS'], op['account'])
+        tnt_server.call('notification_add', op['account'], NTYPES['account_update'], title, body, url, '')
+    if op_type == 'vote':
+        print('----', op['voter'], op['permlink'])
 
 def run():
     global steem
