@@ -12,7 +12,7 @@ import sys
 import tarantool
 import time
 
-MIN_NOTIFY_REPUTATION = 40
+MIN_NOTIFY_REPUTATION = 0
 
 NTYPES = {
     'total': 0,
