@@ -183,7 +183,7 @@ def processComment(op):
 def processTransfer(op):
     if op['from'] == op['to']:
         return
-    print(op_type, op['from'], op['to'])
+    print("transfer", op['from'], op['to'])
     title = 'Steemit'
     body = 'you transfered %s to @%s' % (op['amount'], op['to'])
     url = '%s/@%s/transfers' % (os.environ['STEEMIT_WEBCLIENT_ADDRESS'], op['from'])
@@ -210,7 +210,7 @@ def processTransfer(op):
 
 
 def processAccountUpdate(op):
-    #print(json.dumps(op, indent=4))
+    print(json.dumps(op, indent=4))
     if not ('active' in op or 'owner' in op or 'posting' in op):
         return
 
