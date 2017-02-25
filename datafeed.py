@@ -65,7 +65,7 @@ def getFollowersWithDirection(account, direction='follower', last_user=''):
 
 
 def getFollowers(account):
-    # print('getFollowers', account.name)
+    print('getFollowers', account.name)
     res = followers_space.select(account.name)
     if len(res) == 0:
         followers = getFollowersWithDirection(account)
@@ -76,7 +76,7 @@ def getFollowers(account):
 
 
 def addFollower(account_name, follower):
-    # print('addFollower', account_name, follower)
+    print('addFollower', account_name, follower)
     res = tnt_server.call('add_follower', account_name, follower)
     if not res[0][0]:
         with suppress(Exception):
@@ -90,7 +90,7 @@ def processMentions(author_account, text, op):
     mentions = re.findall('\@[\w\d.-]+', text)
     if (len(mentions) == 0):
         return
-    # print('\nop: ', op)
+    print('\nop: ', op)
     if op['parent_author']:
         what = 'comment'
         url = '%s/@%s/%s#@%s/%s' % (
@@ -108,7 +108,7 @@ def processMentions(author_account, text, op):
         if (mention == op['author']):
             # don't notify on self-mentions
             continue
-        # print('--- mention: ', what, url, mention, mention[1:])
+        print('--- mention: ', what, url, mention, mention[1:])
         title = 'Steemit'
         body = '@%s mentioned you in a %s' % (op['author'], what)
         profile = author_account.profile
@@ -144,7 +144,7 @@ def processComment(op):
         return
     post = Post(op, steem_instance=steem)
     pkey = getPostKey(post)
-    # print('post: ', pkey)
+    print('post: ', pkey)
     if not pkey or pkey in processed_posts:
         return
     processed_posts[pkey] = True
@@ -183,7 +183,7 @@ def processComment(op):
 def processTransfer(op):
     if op['from'] == op['to']:
         return
-    # print(op_type, op['from'], op['to'])
+    print(op_type, op['from'], op['to'])
     title = 'Steemit'
     body = 'you transfered %s to @%s' % (op['amount'], op['to'])
     url = '%s/@%s/transfers' % (os.environ['STEEMIT_WEBCLIENT_ADDRESS'], op['from'])
@@ -210,7 +210,7 @@ def processTransfer(op):
 
 
 def processAccountUpdate(op):
-    # print(json.dumps(op, indent=4))
+    #print(json.dumps(op, indent=4))
     if not ('active' in op or 'owner' in op or 'posting' in op):
         return
 
