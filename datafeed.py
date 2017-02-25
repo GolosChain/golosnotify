@@ -80,7 +80,7 @@ def addFollower(account_name, follower):
     res = tnt_server.call('add_follower', account_name, follower)
     if not res[0][0]:
         with suppress(Exception):
-            followers = getFollowersWithDirection(Account(account_name))
+            followers = getFollowersWithDirection(Account(account_name, steem))
             followers.append(follower)
             followers_space.insert((account_name, followers))
             tnt_server.call('add_follower', account_name, follower)
@@ -148,7 +148,7 @@ def processComment(op):
     if not pkey or pkey in processed_posts:
         return
     processed_posts[pkey] = True
-    author_account = Account(op['author'])
+    author_account = Account(op['author'], steem)
     if author_account.rep < MIN_NOTIFY_REPUTATION:
         # no notifications for low-rep accounts
         return
