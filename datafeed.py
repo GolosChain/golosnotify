@@ -148,7 +148,7 @@ def processComment(op):
     if not pkey or pkey in processed_posts:
         return
     processed_posts[pkey] = True
-    author_account = Account(op['author'])
+    author_account = Account(op['author'], steem_instance=steem)
     if author_account.rep < MIN_NOTIFY_REPUTATION:
         # no notifications for low-rep accounts
         return
