@@ -22,5 +22,5 @@ services:
     ports:
       - "3301:3301"
     volumes:
-      - ./data:/var/lib/tarantool
+      - golosnotify_store:/var/lib/tarantool
       - ./:/home/src

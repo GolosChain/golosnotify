@@ -1,10 +1,10 @@
 #!/usr/bin/env python
 from contextlib import suppress
-from steem import Steem
-from steem.account import Account
-from steem.blockchain import Blockchain
-from steem.exceptions import PostDoesNotExist
-from steem.post import Post
+from piston import Steem
+from piston.account import Account
+from piston.blockchain import Blockchain
+from piston.exceptions import PostDoesNotExist
+from piston.post import Post
 import json
 import os
 import re
