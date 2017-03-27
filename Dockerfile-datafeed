@@ -1,6 +1,6 @@
 FROM python:3.5
 
-RUN pip3 install git+https://github.com/xeroc/piston-lib.git@develop tarantool
+RUN pip3 install git+https://github.com/steemit/steem-python.git@master tarantool
 
 ENV STEEM_USER   steem
 ENV STEEM_HOME   /home/steem
