@@ -2,6 +2,7 @@ fiber = require 'fiber'
 require 'notifications'
 require 'locks'
 require 'stats'
+require 'guid'
 
 io.output():setvbuf("no")
 
@@ -59,6 +60,9 @@ box.once('bootstrap', function()
         unique = false,
         parts = {2, 'string', 3, 'string'}
     })
+
+    guid = box.schema.create_space('guid')
+    guid:create_index('primary', {type = 'tree', parts = {1, 'STR'}})
 end)
 
 -- require('console').start()
