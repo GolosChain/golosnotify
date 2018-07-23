@@ -3,6 +3,7 @@ require 'notifications'
 require 'locks'
 require 'stats'
 require 'guid'
+require 'actions'
 
 io.output():setvbuf("no")
 
@@ -63,6 +64,9 @@ box.once('bootstrap', function()
 
     guid = box.schema.create_space('guid')
     guid:create_index('primary', {type = 'tree', parts = {1, 'STR'}})
+
+    actions = box.schema.create_space('actions')
+    actions:create_index('primary', {type = 'tree', parts = {1, 'STR'}})
 end)
 
 -- require('console').start()
