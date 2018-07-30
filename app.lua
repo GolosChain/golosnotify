@@ -1,4 +1,6 @@
 fiber = require 'fiber'
+httpd = require('http.server')
+json = require('json')
 require 'notifications'
 require 'locks'
 require 'stats'
@@ -66,7 +68,29 @@ box.once('bootstrap', function()
     guid:create_index('primary', {type = 'tree', parts = {1, 'STR'}})
 
     actions = box.schema.create_space('actions')
-    actions:create_index('primary', {type = 'tree', parts = {1, 'STR'}})
+    actions:create_index('primary', {type = 'tree', parts = {1, 'string'}})
+    actions:create_index('secondary', {type = 'tree', unique = false, parts = {2, 'string'}})
 end)
 
+function send_json(req, table)
+    local resp = req:render({text = json.encode(table)})
+    resp.headers['content-type'] = 'application/json'
+    resp.status = 200
+    return resp
+end
+
+function root_handler(req)
+    return send_json(req, {status = 'ok'})
+end
+
+function get_inactive_users(req)
+    return send_json(req, inactive_users())
+end
+
+httpd = httpd.new('0.0.0.0', 8082)
+
+httpd:route({ path = '/', method = 'GET' }, root_handler)
+httpd:route({ path = '/inactive_users', method = 'GET' }, get_inactive_users)
+
+httpd:start()
 -- require('console').start()
